@@ -73,6 +73,11 @@ unsigned long keyDelay = 200;      // Usado na rotina de telado
 LiquidCrystal_I2C lcd (0x27, 16, 2);
 TM1637Display display(CLK, DIO); //PASSA OS PARÂMETROS PARA UMA FUNÇÃO DA BIBLIOTECA TM1637Display
 
+// Segmentos para o símbolo de grau (°)
+const uint8_t DEGREE = SEG_A | SEG_B | SEG_F | SEG_G;
+
+// Bit do ponto decimal (DP)
+const uint8_t DOT = 0x80;
 
 I2CKeyPad keyPad(0x20);
 BluetoothSerial SerialBT;
@@ -152,6 +157,38 @@ void Menu_Parametros(byte PanParam[], byte Temperatura[], byte TimePoint[]);
 
 // ---------------------------------------------------------------Rotinas de Inerface --------------------------------------------------------------------------
 
+void exibirTemperaturaTM1637(float temperatura) {
+  // Limite prático do display
+  if (temperatura < 0.0) temperatura = 0.0;
+  if (temperatura > 99.9) temperatura = 99.9;
+
+  // Mantém uma casa decimal
+  int tempInt = (int)(temperatura * 10);
+
+  int centenas = tempInt / 100;
+  int dezenas  = (tempInt / 10) % 10;
+  int unidades = tempInt % 10;
+
+  uint8_t digits[4];
+
+  // Primeiro dígito (vazio se < 10)
+  if (centenas == 0) {
+    digits[0] = 0x00;
+  } else {
+    digits[0] = display.encodeDigit(centenas);
+  }
+
+  // Segundo dígito com ponto decimal
+  digits[1] = display.encodeDigit(dezenas) | DOT;
+
+  // Terceiro dígito
+  digits[2] = display.encodeDigit(unidades);
+
+  // Quarto dígito: símbolo de grau
+  digits[3] = DEGREE;
+
+  display.setSegments(digits);
+}
 
 void LoadConfig (double PanConfig[], byte Temperatura[], byte TimePoint[], byte PanParam[])           // Salva as configurações da panela na flash
 {
@@ -244,7 +281,7 @@ void SaveConfig (double PanConfig[], byte Temperatura[], byte TimePoint[], byte 
 
 void Display7Seg(float Leitura)                                                                         // Escreve a temperatutra no Dispplay 7 segmentos
 {
-   display.showNumberDecEx(Leitura*100, 0x40, 1, 4, 0);
+    exibirTemperaturaTM1637(Leitura); 
 }
 
 void EscreverLCD (int c, int l, String txt)                                                               // Escreve um texto na coluna c, linha l do LCD
@@ -1520,10 +1557,10 @@ void setup()
  // Inicializa o LCD 16x2
    
     lcd.init();
+ //   lcd.clear();
+    lcd.backlight();
     lcd.print("Iniciando...");
     delay (1000);
-    lcd.clear();
-    lcd.backlight();
     lcd.cursor_off();
     lcd.setCursor(0, 0);
     lcd.createChar(0, grau);
@@ -1560,7 +1597,7 @@ void setup()
     keyPad.loadKeyMap(keypad_layout);   
 
 // Cria as Tasks
-    xTaskCreatePinnedToCore(loop5, "loop5", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop5()" com prioridade 2, atribuída ao core 0 - Bluetooth
+//    xTaskCreatePinnedToCore(loop5, "loop5", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop5()" com prioridade 2, atribuída ao core 0 - Bluetooth
     xTaskCreatePinnedToCore(loop4, "loop4", 1024, NULL, 2, NULL, 0);//Cria a tarefa "loop4()" com prioridade 2, atribuída ao core 0 - Alarme
     xTaskCreatePinnedToCore(loop3, "loop3", 30440, NULL, 5, NULL, 0);//Cria a tarefa "loop3()" com prioridade 5, atribuída ao core 0 - Interface
     xTaskCreatePinnedToCore(loop2, "loop2", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop2()" com prioridade 5, atribuída ao core 0 - Mosturação
