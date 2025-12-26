@@ -1332,6 +1332,179 @@ void loop4(void *z)
 }
 
 
+// ---------------------------------------------------------------Inicio da Seção de Bluetooth --------------------------------------------------------------------------
+
+/*
+String BluetoothSetConfig()
+{
+	String saida = "";
+	for (int i = 0; i <= 4; i++)
+  {
+    if (Temperatura[i] < 10)
+		   saida = saida + "0"+ String(Temperatura[i]);   // Temperatura das rampas
+    else 
+      saida = saida + String(Temperatura[i]);
+  }
+	for (int i = 0; i <= 4; i++)
+	{	
+		if (TimePoint[i] < 10)
+		   saida = saida + "0" + String(TimePoint[i]);
+		else saida = saida + String(TimePoint[i]);
+	}
+  if (TimePoint[9] < 10) 
+     saida = saida + "0" + String(TimePoint[9]);   // Tempo de Fervura
+  else saida = saida + String(TimePoint[9]);
+  for (int i = 10; i <= 14; i++)
+  { 
+    if (TimePoint[i] < 10)
+       saida = saida + "0" + String(TimePoint[i]);
+    else saida = saida+ String(TimePoint[i]);
+  }
+  
+	for (int i = 0; i <= 4; i++)
+		saida = saida + String(TipAdic[i]);   // Tipos de adiçoes
+	saida = saida + String (NumRampas);
+  saida = saida + String (NumAdic); 
+	int PotInt;
+	if (xSemaphoreTake(POTPAN_Mutex,portMAX_DELAY) == true)
+  {
+	    PotInt = POTPAN;
+	    xSemaphoreGive(POTPAN_Mutex);
+  }
+	String Pot;
+	if (PotInt > 9) Pot = String (PotInt);
+		else Pot = "0" + String (PotInt);
+	saida = saida + Pot;
+	return saida;
+}
+
+void BluetoothLeConfig (String Param)
+{
+    Temperatura[0] = Param.substring(0,2).toInt();   // Temperatura das rampas
+    Temperatura[1] = Param.substring(2,4).toInt();
+    Temperatura[2] = Param.substring(4,6).toInt();
+    Temperatura[3] = Param.substring(6,8).toInt();
+    Temperatura[4] = Param.substring(8,10).toInt();    
+
+	
+    TimePoint[0] = Param.substring(10,12).toInt();   // Tempo das Rampas
+    TimePoint[1] = Param.substring(12,14).toInt();
+    TimePoint[2] = Param.substring(14,16).toInt();
+    TimePoint[3] = Param.substring(16,18).toInt();
+    TimePoint[4] = Param.substring(18,20).toInt();
+    
+	  TimePoint[9] = Param.substring(20,22).toInt();   // tempo de fervura
+	
+    TimePoint[10] = Param.substring(22,24).toInt();   // Tempo das adiçoes
+    TimePoint[11] = Param.substring(24,26).toInt();  
+    TimePoint[12] = Param.substring(26,28).toInt();  
+    TimePoint[13] = Param.substring(28,30).toInt();   
+    TimePoint[14] = Param.substring(30,32).toInt();     
+
+    TipAdic[0] = Param.substring(32,33).toInt();     //Tipos de adiçoes
+    TipAdic[1] = Param.substring(33,34).toInt(); 
+    TipAdic[2] = Param.substring(34,35).toInt(); 
+    TipAdic[3] = Param.substring(35,36).toInt(); 
+    TipAdic[4] = Param.substring(36,37).toInt();    
+
+    NumRampas = Param.substring(37,38).toInt();
+  	NumAdic = Param.substring(38,39).toInt();
+  	String Pot = Param.substring(39,41);
+  	int PotInt = Pot.toInt();
+    if (xSemaphoreTake(POTPAN_Mutex,portMAX_DELAY) == true)
+    {
+  	    POTPAN = PotInt;
+  	    xSemaphoreGive(POTPAN_Mutex);
+    }	
+}
+
+
+
+String FillStr (String txt, byte len)
+{
+   String saida = txt;
+   while (saida.length() < len)
+      saida = saida + " ";
+   return saida;
+} 
+
+String FormatTimer (long t)
+{
+    String Saida = "";
+    String hstr;
+    String mstr;
+
+    int horas = t / 60;
+    if (horas < 10)
+        hstr = "0"+String (horas);
+    else
+        hstr = String (horas);
+    int minutos = t % 60;
+    if (minutos < 10)
+        mstr = "0"+ String (minutos);
+    else
+        mstr = String (minutos);
+
+    Saida =hstr + ":" + mstr;
+    return  Saida;
+}
+
+String MontaMsgBluetooth (String t1,String t2, float l, long t, byte b, bool a)
+{
+    String msgl1 =FillStr(t1,16); 
+    String msgl2 =FillStr(t2,16); 
+    String graustxt = String (l).substring(0, 4)+"º";
+    String tempotxt = FormatTimer (t);
+    String alarmetxt = String (a);
+    String bombatxt =FillStr(String (b),3);
+    return msgl1+msgl2+graustxt+tempotxt+bombatxt+alarmetxt;
+}
+
+String LeSerialBT ()
+{
+    String resp = "";
+    while (SerialBT.available())
+      resp = resp + char (SerialBT.read());
+    return resp;
+}
+
+void EnviaSerial (String txt)
+{
+    bool sair = false;
+    byte cont = 0;
+    while (sair == false)
+    {    
+        SerialBT.print(txt);
+        while (not SerialBT.available() || cont <= 100)
+        {
+            delay(10);
+            ++ cont;
+            if (cont == 100)
+            {
+                sair = true;
+                break;
+            }   
+        }
+        
+        if (LeSerialBT () == "Ok")
+           sair = true;
+        delay(10);
+    }
+}
+*/
+void loop5(void *z)
+{
+    String MsgBluetooth =""; 
+
+    while (1)
+    {
+
+      delay (100);
+    }   
+
+}
+
+
 // ----------------------------------------------------------------- SEÇÃO DE SETUP ------------------------------------------------------------------------------
 void setup() 
 {
@@ -1387,7 +1560,7 @@ void setup()
     keyPad.loadKeyMap(keypad_layout);   
 
 // Cria as Tasks
-//    xTaskCreatePinnedToCore(loop5, "loop5", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop5()" com prioridade 2, atribuída ao core 0 - Bluetooth
+    xTaskCreatePinnedToCore(loop5, "loop5", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop5()" com prioridade 2, atribuída ao core 0 - Bluetooth
     xTaskCreatePinnedToCore(loop4, "loop4", 1024, NULL, 2, NULL, 0);//Cria a tarefa "loop4()" com prioridade 2, atribuída ao core 0 - Alarme
     xTaskCreatePinnedToCore(loop3, "loop3", 30440, NULL, 5, NULL, 0);//Cria a tarefa "loop3()" com prioridade 5, atribuída ao core 0 - Interface
     xTaskCreatePinnedToCore(loop2, "loop2", 10440, NULL, 2, NULL, 0);//Cria a tarefa "loop2()" com prioridade 5, atribuída ao core 0 - Mosturação
